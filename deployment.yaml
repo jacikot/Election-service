@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  databaseAuthentication:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - mynet
+  authenticationMigration:
+    image: authenticationmigration
+    environment:
+      - DATABASE_URL=databaseAuthentication
+    networks:
+      - mynet
+  authentication:
+    image: authentication
+    environment:
+      - DATABASE_URL=databaseAuthentication
+    ports:
+      - 5000:5000
+    networks:
+      - mynet
+
+
+volumes:
+  dbdata:
+
+networks:
+  mynet:
