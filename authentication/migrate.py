@@ -29,12 +29,13 @@ if(__name__=="__main__"):
                 database.session.add(userRole)
                 database.session.commit()
 
+
                 admin = User(
-                    jmbg="0408999715140",
+                    jmbg="0000000000000",
                     email="admin@admin.com",
-                    password="123",
-                    forename="Admin",
-                    surname="Admin",
+                    password="1",
+                    forename="admin",
+                    surname="admin",
                     idRole=1,
                 )
 
