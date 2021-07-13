@@ -8,7 +8,6 @@ class Participation (database.Model):
     pollNumber = database.Column(database.Integer, nullable=False)
     parId = database.Column(database.Integer, database.ForeignKey("participants.parId"), nullable=False)
     elId = database.Column(database.Integer, database.ForeignKey("elections.elId"), nullable=False)
-    result = database.Column(database.Float, nullable=True)
 
     votes = database.relationship("Vote", back_populates="to")
 

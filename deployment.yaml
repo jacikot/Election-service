@@ -21,8 +21,47 @@ services:
       - 5000:5000
     networks:
       - mynet
-
-
+  some-redis:
+    image: redis
+    networks:
+      - mynet
+#    ports:
+#      - 6379:6379
+  databaseElections:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - mynet
+  electionsMigration:
+    image: electionsmigration
+    environment:
+      - DATABASE_URL=databaseElections
+    networks:
+      - mynet
+  admin:
+    image: admin
+    environment:
+      - DATABASE_URL=databaseElections
+    ports:
+      - 5001:5001
+    networks:
+      - mynet
+  daemon:
+    image: daemon
+    environment:
+      - DATABASE_URL=databaseElections
+      - REDIS_URL=some-redis
+    networks:
+      - mynet
+  user:
+    image: user
+    environment:
+      - REDIS_URL=some-redis
+    ports:
+      - 5002:5002
+    networks:
+      - mynet
 volumes:
   dbdata:
 

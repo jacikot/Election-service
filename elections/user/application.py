@@ -29,7 +29,7 @@ def vote():
     pattern = re.compile("^[0-9]+$")
 
     rows =[]
-
+    print(Configuration.REDIS_HOST)
     with Redis(host=Configuration.REDIS_HOST) as redis:
         for row in reader:
             if(len(row)<2 or row[0]=="" or row[1]==""):
@@ -46,4 +46,4 @@ def vote():
 
 
 if ( __name__ == "__main__" ):
-    application.run ( debug = True, port = 5002)
+    application.run ( debug = True, host="0.0.0.0", port = 5002)
