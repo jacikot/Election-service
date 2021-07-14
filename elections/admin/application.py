@@ -46,7 +46,7 @@ def getParticipants():
         "individual": bool(p.individual)
     } for p in participants]
 
-    return jsonify(data)
+    return jsonify(participants=data)
 
 # {
 # "start": ".....",
@@ -72,12 +72,18 @@ def createElection():
         return make_response(jsonify(message="Field individual is missing."), 400)
     if (type(participants) == type("")):
         return make_response(jsonify(message="Field participants is missing."), 400)
-    pattern = re.compile("^[0-9]{4}-(0[0-9]|1[0-2])-([0-2][0-9]|3[0-1])T([0-1][0-9]|2[0-4]):([0-5][0-9]|60):([0-5][0-9]|60)$")
-    if(not pattern.match(start) or not pattern.match(end)):
-        return make_response(jsonify(message="Invalid date and time."), 400)
-
-    startTime = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
-    endTime = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S")
+    # pattern = re.compile("^[0-9]{4}-(0[0-9]|1[0-2])-([0-2][0-9]|3[0-1])T([0-1][0-9]|2[0-4]):([0-5][0-9]|60):([0-5][0-9]|60)")
+    # if(not pattern.match(start) or not pattern.match(end)):
+    #     return make_response(jsonify(message="Invalid date and time."), 400)
+    try:
+        startTime = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S%z")
+        endTime = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S%z")
+    except Exception as e:
+        try:
+            startTime = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
+            endTime = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S")
+        except Exception as e:
+            return make_response(jsonify(message="Invalid date and time."), 400)
     if(startTime>endTime):
         return make_response(jsonify(message="Invalid date and time."), 400)
     el = Election.query.filter(
@@ -89,15 +95,15 @@ def createElection():
     if(el!=None):
         return make_response(jsonify(message="Invalid date and time."), 400)
     if(len(participants)<2):
-        return make_response(jsonify(message="Invalid participant."), 400)
+        return make_response(jsonify(message="Invalid participants."), 400)
 
 
     for p in participants:
         participant = Participant.query.filter(Participant.parId==p).first()
         if(participant==None):
-            return make_response(jsonify(message="Invalid participant."), 400)
+            return make_response(jsonify(message="Invalid participants."), 400)
         if(participant.individual!=int(individual)):
-            return make_response(jsonify(message="Invalid participant."), 400)
+            return make_response(jsonify(message="Invalid participants."), 400)
 
     election = Election(
         timeStart=startTime,
@@ -157,6 +163,7 @@ def getResults():
     if(election==None):
         return make_response(jsonify(message="Election does not exist."), 400)
     now = datetime.now()
+
     if(election.timeEnd > now):
         return make_response(jsonify(message="Election is ongoing."), 400)
 
@@ -196,14 +203,14 @@ def getResults():
         for i in range(250):
             max = -1
             for j in range(len(passCenzus)):
-                if(not passCenzus[max]["passed"]):
+                if(not passCenzus[j]["passed"]):
                     continue
                 if(max==-1
                         or passCenzus[max]["votes"]/(1+passCenzus[max]["result"])<passCenzus[j]["votes"]/(1+passCenzus[j]["result"])
-                        or (
-                                passCenzus[max]["votes"] / (1 + passCenzus[max]["result"]) == passCenzus[j]["votes"] / (1 + passCenzus[j]["result"])
-                            and passCenzus[max]["votes"] < passCenzus[j]["votes"]
-                        )
+                        # or (
+                        #         passCenzus[max]["votes"] / (1 + passCenzus[max]["result"]) == passCenzus[j]["votes"] / (1 + passCenzus[j]["result"])
+                        #     and passCenzus[max]["votes"] < passCenzus[j]["votes"]
+                        # )
                 ):
                     max = j
             if(max!=-1):
@@ -236,4 +243,5 @@ def getResults():
 
 if ( __name__ == "__main__" ):
     database.init_app ( application )
-    application.run ( debug = True, host="0.0.0.0", port=5001 )
+    #application.run ( debug = True, host="0.0.0.0", port=5001 )
+    application.run(debug=True, port=5001)

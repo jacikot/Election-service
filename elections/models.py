@@ -26,7 +26,7 @@ class Election (database.Model):
 
 class Vote (database.Model):
     __tablename__ = "votes"
-    guid = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    guid = database.Column(database.String(256), primary_key=True)
     jmbgUser = database.Column(database.String(13), nullable=False)
     toId = database.Column(database.Integer, database.ForeignKey("participations.prtId"), nullable=False)
 
@@ -34,7 +34,7 @@ class Vote (database.Model):
 
 class InvalidVote (database.Model):
     __tablename__ = "invalidvotes"
-    guid = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    guid = database.Column(database.String(256), primary_key=True)
     jmbgUser = database.Column(database.String(13), nullable=False)
     reason = database.Column(database.String(256), nullable=True)
     pollNumber = database.Column(database.Integer, nullable=False)

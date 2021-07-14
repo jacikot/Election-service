@@ -19,8 +19,8 @@ jwt=JWTManager(application)
 @jwt_required(refresh=False)
 def vote():
 
-    if(request.files["file"]==None):
-        make_response(jsonify(message="Field file missing."), 400)
+    if(request.files.get("file","")==""):
+        return make_response(jsonify(message="Field file is missing."), 400)
 
     content = request.files["file"].stream.read().decode("utf-8")
     stream = io.StringIO(content)
@@ -34,9 +34,9 @@ def vote():
         for row in reader:
             if(len(row)<2 or row[0]=="" or row[1]==""):
                 return make_response(jsonify(message=f"Incorrect number of values on line {idline}."), 400)
-            idline = idline + 1
             if(not pattern.match(row[1]) or int(row[1])<=0):
                 return make_response(jsonify(message=f"Incorrect poll number on line {idline}."), 400)
+            idline = idline + 1
             claims = get_jwt()
             data = row[0]+","+row[1]+","+claims["jmbg"]
             rows.append(data)
@@ -46,4 +46,5 @@ def vote():
 
 
 if ( __name__ == "__main__" ):
-    application.run ( debug = True, host="0.0.0.0", port = 5002)
+    application.run(debug=True, port=5002)
+    #application.run ( debug = True, host="0.0.0.0", port = 5002)
