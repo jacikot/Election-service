@@ -66,9 +66,12 @@ services:
       - 5002:5002
     networks:
       - mynet
+    deploy:
+      replicas: 3
 volumes:
   dbdataa:
   dbdatae:
 
 networks:
   mynet:
+    driver: overlay
